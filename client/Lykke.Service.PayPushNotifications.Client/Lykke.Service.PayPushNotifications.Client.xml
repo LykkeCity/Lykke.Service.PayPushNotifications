@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Lykke.Service.PayPushNotifications.Client</name>
+    </assembly>
+    <members>
+        <member name="M:Lykke.Service.PayPushNotifications.Client.AutofacExtension.RegisterPayPushNotificationsClient(Autofac.ContainerBuilder,Lykke.Service.PayPushNotifications.Client.PayPushNotificationsServiceClientSettings,System.Func{Lykke.HttpClientGenerator.HttpClientGeneratorBuilder,Lykke.HttpClientGenerator.HttpClientGeneratorBuilder})">
+            <summary>
+            Registers <see cref="T:Lykke.Service.PayPushNotifications.Client.IPayPushNotificationsClient"/> in Autofac container using <see cref="T:Lykke.Service.PayPushNotifications.Client.PayPushNotificationsServiceClientSettings"/>.
+            </summary>
+            <param name="builder">Autofac container builder.</param>
+            <param name="settings">PayPushNotifications client settings.</param>
+            <param name="builderConfigure">Optional <see cref="T:Lykke.HttpClientGenerator.HttpClientGeneratorBuilder"/> configure handler.</param>
+        </member>
+        <member name="T:Lykke.Service.PayPushNotifications.Client.IPayPushNotificationsClient">
+            <summary>
+            PayPushNotifications client interface.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.PayPushNotifications.Client.PayPushNotificationsServiceClientSettings">
+            <summary>
+            PayPushNotifications client settings.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.PayPushNotifications.Client.PayPushNotificationsServiceClientSettings.ServiceUrl">
+            <summary>Service url.</summary>
+        </member>
+    </members>
+</doc>
