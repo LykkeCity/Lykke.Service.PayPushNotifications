@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,10 +40,14 @@ namespace Lykke.Service.PayPushNotifications.Services
         {
             var headers = new Dictionary<string, string>
             {
-                {"ServiceBusNotification-Format", "apple"},
-                {"ServiceBusNotification-Tags", string.Join("||", tags)},
+                {"ServiceBusNotification-Format", "apple"},                
                 {"ServiceBusNotification-Apns-Expiry", DateTime.UtcNow.AddDays(10).ToString("s")}
             };
+
+            if (tags.Any())
+            {
+                headers["ServiceBusNotification-Tags"] = string.Join("||", tags);
+            }
 
             return SendNotification(payLoad, headers);
         }
