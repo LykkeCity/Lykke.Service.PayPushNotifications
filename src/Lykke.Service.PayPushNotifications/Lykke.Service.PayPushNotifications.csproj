@@ -30,6 +30,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\client\Lykke.Service.PayPushNotifications.Client\Lykke.Service.PayPushNotifications.Client.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.AzureRepositories\Lykke.Service.PayPushNotifications.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.Core\Lykke.Service.PayPushNotifications.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.Services\Lykke.Service.PayPushNotifications.Services.csproj" />

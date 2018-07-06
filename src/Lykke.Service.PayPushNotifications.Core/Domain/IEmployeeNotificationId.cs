@@ -2,7 +2,7 @@
 {
     public interface IEmployeeNotificationId
     {
-        string EmployeeEmail { get; }
+        string EmployeeId { get; }
         NotificationPlatform Platform { get; }
         string NotificationId { get; }
     }

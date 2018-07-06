@@ -9,7 +9,7 @@ namespace Lykke.Service.PayPushNotifications.AzureRepositories.EmployeeNotificat
     [ValueTypeMergingStrategy(ValueTypeMergingStrategy.UpdateIfDirty)]
     public class EmployeeNotificationIdEntity : AzureTableEntity, IEmployeeNotificationId
     {
-        public string EmployeeEmail => PartitionKey;
+        public string EmployeeId => PartitionKey;
 
         public NotificationPlatform Platform => Enum.Parse<NotificationPlatform>(RowKey, true);
 
@@ -21,13 +21,13 @@ namespace Lykke.Service.PayPushNotifications.AzureRepositories.EmployeeNotificat
 
         public EmployeeNotificationIdEntity(IEmployeeNotificationId employeeNotificationId)
         {
-            PartitionKey = GetPartitionKey(employeeNotificationId.EmployeeEmail);
+            PartitionKey = GetPartitionKey(employeeNotificationId.EmployeeId);
             RowKey = GetRowKey(employeeNotificationId.Platform);
             NotificationId = employeeNotificationId.NotificationId;
         }
 
-        internal static string GetPartitionKey(string employeeEmail)
-            => employeeEmail;
+        internal static string GetPartitionKey(string employeeId)
+            => employeeId;
         internal static string GetRowKey(NotificationPlatform platform)
             => platform.ToString();
     }

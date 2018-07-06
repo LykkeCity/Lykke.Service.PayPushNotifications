@@ -2,7 +2,7 @@
 {
     public class EmployeeNotificationId: IEmployeeNotificationId
     {
-        public string EmployeeEmail { get; set; }
+        public string EmployeeId { get; set; }
         public NotificationPlatform Platform { get; set; }
         public string NotificationId { get; set; }
     }

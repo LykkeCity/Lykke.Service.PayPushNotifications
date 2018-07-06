@@ -4,7 +4,7 @@
     {
         string[] MerchantIds { get; }
 
-        string[] Emails { get; }
+        string[] EmployeeIds { get; }
         
         string Message { get; }
     }

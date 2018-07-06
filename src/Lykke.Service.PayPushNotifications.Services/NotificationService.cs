@@ -66,7 +66,7 @@ namespace Lykke.Service.PayPushNotifications.Services
         {
             var notificationIds = new Dictionary<NotificationPlatform, List<string>>();
 
-            await GetEmployeeNotificationIdsAsync(notificationIds, notification.Emails);
+            await GetEmployeeNotificationIdsAsync(notificationIds, notification.EmployeeIds);
             await GetMerchantNotificationIdsAsync(notificationIds, notification.MerchantIds);
 
             return notificationIds;
@@ -74,11 +74,11 @@ namespace Lykke.Service.PayPushNotifications.Services
 
         private async Task GetEmployeeNotificationIdsAsync(
             IDictionary<NotificationPlatform, List<string>> notificationIds,
-            string[] emails)
+            string[] employeeIds)
         {
-            if (emails != null)
+            if (employeeIds != null)
             {
-                var employeeNotificationIds = await _employeeNotificationIdRepository.GetAsync(emails);
+                var employeeNotificationIds = await _employeeNotificationIdRepository.GetAsync(employeeIds);
                 foreach (var notificationId in employeeNotificationIds)
                 {
                     AddNotificationId(notificationIds, notificationId.Platform, notificationId.NotificationId);
@@ -114,9 +114,9 @@ namespace Lykke.Service.PayPushNotifications.Services
         #endregion Send
 
         #region GetNotificationIds
-        public async Task<Dictionary<NotificationPlatform, string[]>> GetNotificationIdsAsync(string employeeEmail, string merchantId)
+        public async Task<Dictionary<NotificationPlatform, string[]>> GetNotificationIdsAsync(string employeeId, string merchantId)
         {
-            var employeeNotificationIds = await GetEmployeeNotificationIdsAsync(employeeEmail);
+            var employeeNotificationIds = await GetEmployeeNotificationIdsAsync(employeeId);
             var merchantNotificationIds = await GetMerchantNotificationIdsAsync(merchantId);
 
             var result = new Dictionary<NotificationPlatform, string[]>();
@@ -133,27 +133,27 @@ namespace Lykke.Service.PayPushNotifications.Services
         }
 
         private async Task<IEmployeeNotificationId[]> GetEmployeeNotificationIdsAsync(
-            string employeeEmail)
+            string employeeId)
         {
-            if (string.IsNullOrEmpty(employeeEmail))
+            if (string.IsNullOrEmpty(employeeId))
             {
                 return new IEmployeeNotificationId[0];
             }
 
-            var notificationIds = (await _employeeNotificationIdRepository.GetAsync(employeeEmail)).ToArray();
+            var notificationIds = (await _employeeNotificationIdRepository.GetAsync(employeeId)).ToArray();
             if (notificationIds.Count() >= _platforms.Length)
             {
                 return notificationIds;
             }
 
             var newNotificationIds =
-                await AddMissedEmployeeNotificationIdsAsync(employeeEmail, notificationIds);
+                await AddMissedEmployeeNotificationIdsAsync(employeeId, notificationIds);
 
             return notificationIds.Union(newNotificationIds).ToArray();
         }
 
         private async Task<IEmployeeNotificationId[]> AddMissedEmployeeNotificationIdsAsync(
-            string employeeEmail, IEmployeeNotificationId[] notificationIds)
+            string employeeId, IEmployeeNotificationId[] notificationIds)
         {
             var newNotificationIds = new List<IEmployeeNotificationId>();
 
@@ -166,7 +166,7 @@ namespace Lykke.Service.PayPushNotifications.Services
 
                 newNotificationIds.Add(new EmployeeNotificationId
                 {
-                    EmployeeEmail = employeeEmail,
+                    EmployeeId = employeeId,
                     NotificationId = Guid.NewGuid().ToString(),
                     Platform = platform
                 });

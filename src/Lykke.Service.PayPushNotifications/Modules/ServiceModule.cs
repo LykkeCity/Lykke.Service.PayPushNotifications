@@ -7,6 +7,7 @@ using Lykke.Logs;
 using Lykke.Service.PayPushNotifications.AzureRepositories.EmployeeNotificationIds;
 using Lykke.Service.PayPushNotifications.AzureRepositories.MerchantNotificationIds;
 using Lykke.Service.PayPushNotifications.AzureRepositories.Notifications;
+using Lykke.Service.PayPushNotifications.Client;
 using Lykke.Service.PayPushNotifications.Core.Domain;
 using Lykke.Service.PayPushNotifications.Core.Services;
 using Lykke.Service.PayPushNotifications.Rabbit;
@@ -89,6 +90,11 @@ namespace Lykke.Service.PayPushNotifications.Modules
                 .AutoActivate()
                 .SingleInstance()
                 .WithParameter("settings", _appSettings.CurrentValue.PayPushNotificationsService.Rabbit);
+
+            builder.RegisterPayPushNotificationsClient(new PayPushNotificationsServiceClientSettings
+            {
+                ServiceUrl = "http://localhost:5000"
+            }, b => b);
         }
     }
 }

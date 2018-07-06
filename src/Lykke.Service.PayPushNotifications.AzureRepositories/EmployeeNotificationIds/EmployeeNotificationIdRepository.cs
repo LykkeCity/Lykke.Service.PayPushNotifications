@@ -15,14 +15,14 @@ namespace Lykke.Service.PayPushNotifications.AzureRepositories.EmployeeNotificat
             _storage = storage;
         }
 
-        public async Task<IEnumerable<IEmployeeNotificationId>> GetAsync(string employeeEmail)
+        public async Task<IEnumerable<IEmployeeNotificationId>> GetAsync(string employeeId)
         {
-            return await _storage.GetDataAsync(EmployeeNotificationIdEntity.GetPartitionKey(employeeEmail));
+            return await _storage.GetDataAsync(EmployeeNotificationIdEntity.GetPartitionKey(employeeId));
         }
 
-        public async Task<IEnumerable<IEmployeeNotificationId>> GetAsync(IEnumerable<string> employeeEmails)
+        public async Task<IEnumerable<IEmployeeNotificationId>> GetAsync(IEnumerable<string> employeeIds)
         {
-            return await _storage.GetDataAsync(employeeEmails.Select(EmployeeNotificationIdEntity.GetPartitionKey));
+            return await _storage.GetDataAsync(employeeIds.Select(EmployeeNotificationIdEntity.GetPartitionKey));
         }
 
         public Task InsertOrReplaceAsync(IEmployeeNotificationId employeeNotificationId)

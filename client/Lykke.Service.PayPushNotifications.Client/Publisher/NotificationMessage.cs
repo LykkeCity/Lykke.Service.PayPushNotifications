@@ -6,7 +6,7 @@ namespace Lykke.Service.PayPushNotifications.Client.Publisher
     {
         public string[] MerchantIds { get; set; }
 
-        public string[] Emails { get; set; }
+        public string[] EmployeeIds { get; set; }
 
         [Required]
         public string Message { get; set; }

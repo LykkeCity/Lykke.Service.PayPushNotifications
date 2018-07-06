@@ -8,7 +8,7 @@ namespace Lykke.Service.PayPushNotifications.Core.Services
     {
         Task SendAsync(NotificationMessage notification);
 
-        Task<Dictionary<NotificationPlatform, string[]>> GetNotificationIdsAsync(string employeeEmail,
+        Task<Dictionary<NotificationPlatform, string[]>> GetNotificationIdsAsync(string employeeId,
             string merchantId);
     }
 }

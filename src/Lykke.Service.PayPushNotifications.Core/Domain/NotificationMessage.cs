@@ -4,7 +4,7 @@
     {
         public string[] MerchantIds { get; set; }
 
-        public string[] Emails { get; set; }
+        public string[] EmployeeIds { get; set; }
 
         public string Message { get; set; }
     }
