@@ -5,10 +5,8 @@ using Lykke.Service.PayPushNotifications.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Service.PayPushNotifications.Client;
 
 namespace Lykke.Service.PayPushNotifications.Controllers
 {
@@ -17,15 +15,12 @@ namespace Lykke.Service.PayPushNotifications.Controllers
     public class NotificationController: Controller
     {
         private readonly INotificationService _notificationService;
-        private readonly IPayPushNotificationsClient _payPushNotificationsClient;
         private readonly IMapper _mapper;
 
-        public NotificationController(INotificationService notificationService, IMapper mapper,
-            IPayPushNotificationsClient payPushNotificationsClient)
+        public NotificationController(INotificationService notificationService, IMapper mapper)
         {
             _notificationService = notificationService;
             _mapper = mapper;
-            _payPushNotificationsClient = payPushNotificationsClient;
         }
 
         /// <summary>
