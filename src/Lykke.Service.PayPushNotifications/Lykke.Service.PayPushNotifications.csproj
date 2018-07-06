@@ -22,14 +22,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="Lykke.RabbitMqBroker" Version="7.1.0" />
     <PackageReference Include="Lykke.Sdk" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.AzureRepositories\Lykke.Service.PayPushNotifications.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.Core\Lykke.Service.PayPushNotifications.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.PayPushNotifications.Services\Lykke.Service.PayPushNotifications.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
