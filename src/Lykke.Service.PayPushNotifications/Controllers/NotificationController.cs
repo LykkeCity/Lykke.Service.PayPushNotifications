@@ -7,7 +7,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Service.PayPushNotifications.Core.Domain;
 
 namespace Lykke.Service.PayPushNotifications.Controllers
 {
@@ -40,16 +39,6 @@ namespace Lykke.Service.PayPushNotifications.Controllers
             var results = await _notificationService.GetNotificationIdsAsync(employeeId, merchantId);
             var models = _mapper.Map<Dictionary<string, string[]>>(results);
             return Ok(models);
-        }
-
-        [HttpPost]
-        [SwaggerOperation("SendTest")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> SendTest([FromBody]NotificationMessage message)
-        {
-            await _notificationService.SendAsync(message);
-            return Ok();
         }
     }
 }

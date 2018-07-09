@@ -41,11 +41,6 @@ namespace Lykke.Service.PayPushNotifications.Services
             var notificationIds = await GetNotificationIdsAsync(notification);
             if (!notificationIds.Any())
             {
-                var builder = _builderFactory.CreateBuilder(NotificationPlatform.Aps);
-                builder.AddMessage(notification.Message);
-
-                var client = _clientFactory.GetClient(NotificationPlatform.Aps);
-                await client.SendNotificationAsync(builder.ToString(), new string[0]);
                 return;
             }
 
