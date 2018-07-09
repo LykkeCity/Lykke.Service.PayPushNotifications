@@ -1,8 +1,9 @@
-﻿using Lykke.SettingsReader.Attributes;
+﻿using Lykke.Service.PayPushNotifications.Core.Settings;
+using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.PayPushNotifications.Settings
 {
-    public class RabbitMqSubscriberSettings
+    public class RabbitMqSubscriberSettings : IRabbitMqSubscriberSettings
     {
         [AmqpCheck]
         public string ConnectionString { get; set; }

@@ -1,26 +1,27 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Autofac;
 using Common;
-using Common.Log;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.PayPushNotifications.Core.Domain;
 using Lykke.Service.PayPushNotifications.Core.Services;
-using Lykke.Service.PayPushNotifications.Settings;
-using System;
-using System.Threading.Tasks;
+using Lykke.Service.PayPushNotifications.Core.Settings;
 
-namespace Lykke.Service.PayPushNotifications.Rabbit
+namespace Lykke.Service.PayPushNotifications.Services
 {
     public class NotificationSubscriber : IStartable, IStopable
     {
         private RabbitMqSubscriber<NotificationMessage> _subscriber;
-        private readonly RabbitMqSubscriberSettings _settings;
+        private readonly IRabbitMqSubscriberSettings _settings;
         private readonly ILogFactory _logFactory;
         private readonly INotificationService _notificationService;
 
         public NotificationSubscriber(INotificationService notificationService,
-            RabbitMqSubscriberSettings settings, ILogFactory logFactory)
+            IRabbitMqSubscriberSettings settings, ILogFactory logFactory)
         {
             _notificationService = notificationService;
             _settings = settings;
@@ -37,8 +38,8 @@ namespace Lykke.Service.PayPushNotifications.Rabbit
                 IsDurable = true
             };
 
-            var errorHandlingStrategy = new ResilientErrorHandlingStrategy(_logFactory, settings, 
-                TimeSpan.FromSeconds(10), 
+            var errorHandlingStrategy = new ResilientErrorHandlingStrategy(_logFactory, settings,
+                TimeSpan.FromSeconds(10),
                 next: new DeadQueueErrorHandlingStrategy(_logFactory, settings));
 
             _subscriber = new RabbitMqSubscriber<NotificationMessage>(_logFactory, settings,
