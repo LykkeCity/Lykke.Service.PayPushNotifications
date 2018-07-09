@@ -34,8 +34,14 @@ namespace Lykke.Service.PayPushNotifications.Controllers
         [SwaggerOperation("GetNotificationIds")]
         [ProducesResponseType(typeof(Dictionary<string, string[]>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetNotificationIds(string employeeId, string merchantId)
+        public async Task<IActionResult> GetNotificationIds([PartitionOrRowKey]string employeeId, 
+            [PartitionOrRowKey]string merchantId)
         {
+            if (string.IsNullOrEmpty(employeeId) && string.IsNullOrEmpty(merchantId))
+            {
+                return BadRequest("Can not generate notification identies on empty parameters.");
+            }
+
             var results = await _notificationService.GetNotificationIdsAsync(employeeId, merchantId);
             var models = _mapper.Map<Dictionary<string, string[]>>(results);
             return Ok(models);

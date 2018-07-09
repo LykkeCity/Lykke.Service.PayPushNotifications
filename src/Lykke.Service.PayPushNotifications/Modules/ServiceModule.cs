@@ -3,17 +3,16 @@ using AutoMapper;
 using AzureStorage.Tables;
 using Common;
 using Lykke.Common.Log;
-using Lykke.Logs;
 using Lykke.Service.PayPushNotifications.AzureRepositories.EmployeeNotificationIds;
 using Lykke.Service.PayPushNotifications.AzureRepositories.MerchantNotificationIds;
 using Lykke.Service.PayPushNotifications.AzureRepositories.Notifications;
 using Lykke.Service.PayPushNotifications.Core.Domain;
 using Lykke.Service.PayPushNotifications.Core.Services;
-using Lykke.Service.PayPushNotifications.Rabbit;
 using Lykke.Service.PayPushNotifications.Services;
 using Lykke.Service.PayPushNotifications.Settings;
 using Lykke.SettingsReader;
 using System.Collections.Generic;
+using Lykke.Sdk;
 using NotificationPlatform = Lykke.Service.PayPushNotifications.Core.Domain.NotificationPlatform;
 
 namespace Lykke.Service.PayPushNotifications.Modules
@@ -21,45 +20,45 @@ namespace Lykke.Service.PayPushNotifications.Modules
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _appSettings;
-        private readonly ILogFactory _logFactory;
 
         public ServiceModule(IReloadingManager<AppSettings> appSettings)
         {
             _appSettings = appSettings;
-            _logFactory = LogFactory.Create();
         }
 
         protected override void Load(ContainerBuilder builder)
         {
             // Do not register entire settings in container, pass necessary settings to services which requires them
-            //builder.RegisterInstance(_log)
-            //    .As<ILog>()
-            //    .SingleInstance();
-
             var mapperProvider = new MapperProvider();
             IMapper mapper = mapperProvider.GetMapper();
             builder.RegisterInstance(mapper).As<IMapper>();
 
-            builder.RegisterInstance<IEmployeeNotificationIdRepository>(
-                new EmployeeNotificationIdRepository(
-                    AzureTableStorage<EmployeeNotificationIdEntity>.Create(
-                        _appSettings.ConnectionString(x => x.PayPushNotificationsService.Db.DataConnString),
-                        _appSettings.CurrentValue.PayPushNotificationsService.Db.EmployeeNotificationIdsTableName,
-                        _logFactory)));
+            builder.Register(c =>
+                    new EmployeeNotificationIdRepository(
+                        AzureTableStorage<EmployeeNotificationIdEntity>.Create(
+                            _appSettings.ConnectionString(x => x.PayPushNotificationsService.Db.DataConnString),
+                            _appSettings.CurrentValue.PayPushNotificationsService.Db.EmployeeNotificationIdsTableName,
+                            c.Resolve<ILogFactory>())))
+                .As<IEmployeeNotificationIdRepository>()
+                .SingleInstance();
 
-
-            builder.RegisterInstance<IMerchantNotificationIdRepository>(
+            builder.Register(c=>
                 new MerchantNotificationIdRepository(
                     AzureTableStorage<MerchantNotificationIdEntity>.Create(
                         _appSettings.ConnectionString(x => x.PayPushNotificationsService.Db.DataConnString),
                         _appSettings.CurrentValue.PayPushNotificationsService.Db.MerchantNotificationIdsTableName,
-                        _logFactory)));
+                        c.Resolve<ILogFactory>())))
+            .As<IMerchantNotificationIdRepository>()    
+            .SingleInstance();
 
-            builder.RegisterInstance<INotificationRepository>(
+            builder.Register(c=>
                 new NotificationRepository(
                     AzureTableStorage<NotificationEntity>.Create(
                         _appSettings.ConnectionString(x => x.PayPushNotificationsService.Db.DataConnString),
-                        _appSettings.CurrentValue.PayPushNotificationsService.Db.NotificationsTableName, _logFactory)));
+                        _appSettings.CurrentValue.PayPushNotificationsService.Db.NotificationsTableName,
+                        c.Resolve<ILogFactory>())))
+            .As<INotificationRepository>()
+            .SingleInstance();
 
             builder.RegisterType<PayLoadBuilderFactory>()
                 .As<IPayLoadBuilderFactory>()
@@ -84,11 +83,14 @@ namespace Lykke.Service.PayPushNotifications.Modules
                 .SingleInstance();
 
             builder.RegisterType<NotificationSubscriber>()
-                .As<IStartable>()
+                .AsSelf()
                 .As<IStopable>()
-                .AutoActivate()
                 .SingleInstance()
                 .WithParameter("settings", _appSettings.CurrentValue.PayPushNotificationsService.Rabbit);
+
+            builder.RegisterType<StartupManager>()
+                .As<IStartupManager>()
+                .SingleInstance();
         }
     }
 }
