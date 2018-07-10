@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Common;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
 
 namespace Lykke.Service.PayPushNotifications.Client.Publisher
 {
@@ -15,21 +17,42 @@ namespace Lykke.Service.PayPushNotifications.Client.Publisher
     {
         private readonly RabbitMqPublisherSettings _settings;
         private readonly ILogFactory _logFactory;
+        private readonly ILog _log;
         private RabbitMqPublisher<INotificationMessage> _publisher;
+
+        [Obsolete]
+        public NotificationPublisher(RabbitMqPublisherSettings settings, ILog log)
+        {
+            _settings = settings;
+            _log = log;
+        }
 
         public NotificationPublisher(RabbitMqPublisherSettings settings, ILogFactory logFactory)
         {
             _settings = settings;
             _logFactory = logFactory;
+            _log = _logFactory.CreateLog(this);
         }
 
         public void Start()
         {
-            var settings = RabbitMqSubscriptionSettings.CreateForPublisher(_settings.ConnectionString, _settings.ExchangeName);
+            var settings =
+                RabbitMqSubscriptionSettings.CreateForPublisher(_settings.ConnectionString,
+                    _settings.ExchangeName);
             settings.MakeDurable();
 
-            _publisher = new RabbitMqPublisher<INotificationMessage>(_logFactory, settings)
-                .DisableInMemoryQueuePersistence()
+            if (_logFactory == null)
+            {
+                _publisher = new RabbitMqPublisher<INotificationMessage>(settings)
+                    .SetConsole(new LogToConsole())
+                    .SetLogger(_log);
+            }
+            else
+            {
+                _publisher = new RabbitMqPublisher<INotificationMessage>(_logFactory, settings);
+            }
+
+            _publisher.DisableInMemoryQueuePersistence()
                 .PublishSynchronously()
                 .SetSerializer(new JsonMessageSerializer<INotificationMessage>())
                 .SetPublishStrategy(new DefaultFanoutPublishStrategy(settings))
