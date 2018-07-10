@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
+using Lykke.Common.Log;
 
 namespace Lykke.Service.PayPushNotifications.Services
 {
@@ -15,12 +17,14 @@ namespace Lykke.Service.PayPushNotifications.Services
         private readonly IMerchantNotificationIdRepository _merchantNotificationIdRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly NotificationPlatform[] _platforms;
+        private readonly ILog _log;
 
         public NotificationService(IPayLoadBuilderFactory builderFactory, 
             INotificationClientFactory clientFactory, 
             IEmployeeNotificationIdRepository employeeNotificationIdRepository,
             IMerchantNotificationIdRepository merchantNotificationIdRepository,
-            INotificationRepository notificationRepository)
+            INotificationRepository notificationRepository,
+            ILogFactory logFactory)
         {
             _builderFactory = builderFactory;
             _clientFactory = clientFactory;
@@ -28,9 +32,11 @@ namespace Lykke.Service.PayPushNotifications.Services
             _merchantNotificationIdRepository = merchantNotificationIdRepository;
             _notificationRepository = notificationRepository;
             _platforms = Enum.GetValues(typeof(NotificationPlatform)).Cast<NotificationPlatform>().ToArray();
+            _log = logFactory.CreateLog(this);
         }
 
         #region Send
+
         public async Task SendAsync(NotificationMessage notification)
         {
             if (notification == null)
@@ -38,27 +44,36 @@ namespace Lykke.Service.PayPushNotifications.Services
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            var notificationIds = await GetNotificationIdsAsync(notification);
-            if (!notificationIds.Any())
+            try
             {
-                return;
+                var notificationIds = await GetNotificationIdsAsync(notification);
+                if (!notificationIds.Any())
+                {
+                    return;
+                }
+
+                var tasks = new List<Task>();
+                foreach (var platform in notificationIds.Keys)
+                {
+                    var builder = _builderFactory.CreateBuilder(platform);
+                    builder.AddMessage(notification.Message);
+
+                    var client = _clientFactory.GetClient(platform);
+                    tasks.Add(client.SendNotificationAsync(builder.ToString(), notificationIds[platform]));
+                }
+
+                tasks.Add(_notificationRepository.InsertOrReplaceAsync(new Notification()
+                {
+                    NotificationMessage = notification
+                }));
+
+                await Task.WhenAll(tasks);
             }
-
-            var tasks = new List<Task>();
-            foreach (var platform in notificationIds.Keys)
+            catch (Exception ex)
             {
-                var builder = _builderFactory.CreateBuilder(platform);
-                builder.AddMessage(notification.Message);
-
-                var client = _clientFactory.GetClient(platform);
-                tasks.Add(client.SendNotificationAsync(builder.ToString(), notificationIds[platform]));
+                _log.Error(ex);
+                throw;
             }
-
-            tasks.Add(_notificationRepository.InsertOrReplaceAsync(new Notification()
-            {
-                NotificationMessage = notification
-            }));
-            await Task.WhenAll(tasks);
         }
 
         private async Task<IDictionary<NotificationPlatform, List<string>>> GetNotificationIdsAsync(
