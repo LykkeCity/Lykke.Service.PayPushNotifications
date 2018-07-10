@@ -1,2 +1,2 @@
 # Lykke.Service.PayPushNotifications
-Facade for lykke pay push notifications.
+Facade for Lykke pay push notifications.
