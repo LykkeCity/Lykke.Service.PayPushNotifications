@@ -137,11 +137,20 @@ namespace Lykke.Service.PayPushNotifications.Services
             var result = new Dictionary<NotificationPlatform, string[]>();
             foreach (var platform in _platforms)
             {
-                result[platform] = new[]
+                var notificationIds = new List<string>();
+                var employeeNotificationId = employeeNotificationIds.FirstOrDefault(n => n.Platform == platform);
+                if (employeeNotificationId != null)
                 {
-                    employeeNotificationIds.First(n=>n.Platform== platform).NotificationId,
-                    merchantNotificationIds.First(n=>n.Platform== platform).NotificationId
-                };
+                    notificationIds.Add(employeeNotificationId.NotificationId);
+                }
+
+                var merchantNotificationId = merchantNotificationIds.FirstOrDefault(n => n.Platform == platform);
+                if (merchantNotificationId != null)
+                {
+                    notificationIds.Add(merchantNotificationId.NotificationId);
+                }
+
+                result[platform] = notificationIds.ToArray();
             }
 
             return result;
