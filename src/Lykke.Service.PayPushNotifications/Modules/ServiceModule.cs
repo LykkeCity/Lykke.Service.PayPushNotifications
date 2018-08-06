@@ -64,19 +64,19 @@ namespace Lykke.Service.PayPushNotifications.Modules
                 .As<IPayLoadBuilderFactory>()
                 .SingleInstance();
 
-            builder.RegisterType<NotificationClientFactory>()
-                .As<INotificationClientFactory>()
-                .SingleInstance()
-                .WithParameter("clients",
+            builder.Register(c => new NotificationClientFactory(
                     new Dictionary<NotificationPlatform, INotificationClient>
                     {
                         {
                             NotificationPlatform.Aps,
                             AppleNotificationClient.CreateClientFromConnectionString(
                                 _appSettings.CurrentValue.PayPushNotificationsService.HubConnectionString,
-                                _appSettings.CurrentValue.PayPushNotificationsService.HubName)
+                                _appSettings.CurrentValue.PayPushNotificationsService.HubName,
+                                c.Resolve<ILogFactory>())
                         }
-                    });
+                    }))
+                .As<INotificationClientFactory>()
+                .SingleInstance();
 
             builder.RegisterType<NotificationService>()
                 .As<INotificationService>()
