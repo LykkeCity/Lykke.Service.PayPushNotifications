@@ -62,12 +62,12 @@ namespace Lykke.Service.PayPushNotifications.Services
                     tasks.Add(client.SendNotificationAsync(builder.ToString(), notificationIds[platform]));
                 }
 
-                tasks.Add(_notificationRepository.InsertOrReplaceAsync(new Notification()
+                await Task.WhenAll(tasks);
+
+                await _notificationRepository.InsertOrReplaceAsync(new Notification()
                 {
                     NotificationMessage = notification
-                }));
-
-                await Task.WhenAll(tasks);
+                });
             }
             catch (Exception ex)
             {
