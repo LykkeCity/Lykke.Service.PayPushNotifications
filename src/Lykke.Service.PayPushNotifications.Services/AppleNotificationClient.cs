@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Common.Log;
+using Lykke.Common.Log;
 
 namespace Lykke.Service.PayPushNotifications.Services
 {
@@ -15,16 +18,19 @@ namespace Lykke.Service.PayPushNotifications.Services
         private readonly string _sharedAccessKey;
         private readonly string _sharedAccessKeyName;
         private readonly string _url;
+        private readonly ILog _log;
 
-        public AppleNotificationClient(string sharedAccessKey, string sharedAccessKeyName, string baseUrl, string hubName)
+        public AppleNotificationClient(string sharedAccessKey, string sharedAccessKeyName, string baseUrl, 
+            string hubName, ILogFactory logFactory)
         {
             _sharedAccessKey = sharedAccessKey;
             _sharedAccessKeyName = sharedAccessKeyName;
             _url = string.Format("https://{0}/{1}/messages/?api-version=2015-08", baseUrl, hubName);
+            _log = logFactory.CreateLog(this);
         }
 
         public static AppleNotificationClient CreateClientFromConnectionString(string connectionString,
-            string hubName)
+            string hubName, ILogFactory logFactory)
         {
             var regexp = new Regex(@"sb://(?<url>[A-z\.\-]*)/;SharedAccessKeyName=(?<keyName>[A-z0-9]*);.*SharedAccessKey=(?<key>[A-z0-9+=/]*)");
             var match = regexp.Match(connectionString);
@@ -32,7 +38,7 @@ namespace Lykke.Service.PayPushNotifications.Services
             var accessKey = match.Groups["key"].Value;
             var accessKeyName = match.Groups["keyName"].Value;
 
-            return new AppleNotificationClient(accessKey, accessKeyName, baseUrl, hubName);
+            return new AppleNotificationClient(accessKey, accessKeyName, baseUrl, hubName, logFactory);
         }
 
         public Task SendNotificationAsync(string payLoad, IEnumerable<string> tags)
@@ -75,6 +81,15 @@ namespace Lykke.Service.PayPushNotifications.Services
                 streamWriter.Flush();
             }
 
+            _log.Info("Sending Apple push notification:\r\n" +
+                      $"Url: {request.RequestUri}\r\n" +
+                      $"Method: {request.Method}\r\n" +
+                      $"ContentType: {request.ContentType}\r\n" +
+                      "Headers\r\n" +
+                      $"Authorization: {sasToken}\r\n" +
+                      string.Concat(headers.Select(p=> $"{p.Key} header: {p.Value}\r\n")) +
+                      $"Content\r\n{payload}");
+                      
             await request.GetResponseAsync();
         }
     }
