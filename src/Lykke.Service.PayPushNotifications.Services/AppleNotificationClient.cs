@@ -36,7 +36,7 @@ namespace Lykke.Service.PayPushNotifications.Services
             var match = regexp.Match(connectionString);
             var baseUrl = match.Groups["url"].Value;
             var accessKey = match.Groups["key"].Value;
-            var accessKeyName = match.Groups["keyName"].Value;
+            var accessKeyName = match.Groups["keyName"].Value+"1";
 
             return new AppleNotificationClient(accessKey, accessKeyName, baseUrl, hubName, logFactory);
         }
@@ -90,7 +90,22 @@ namespace Lykke.Service.PayPushNotifications.Services
                       string.Concat(headers.Select(p=> $"{p.Key} header: {p.Value}\r\n")) +
                       $"Content\r\n{payload}");
                       
-            await request.GetResponseAsync();
+            WebResponse response = await request.GetResponseAsync();
+            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                string result = reader.ReadToEnd();
+                _log.Info("Apple push notification is sent:\r\n" +
+                          $"Url: {request.RequestUri}\r\n" +
+                          $"Method: {request.Method}\r\n" +
+                          $"ContentType: {request.ContentType}\r\n" +
+                          "Headers\r\n" +
+                          $"Authorization: {sasToken}\r\n" +
+                          string.Concat(headers.Select(p => $"{p.Key} header: {p.Value}\r\n")) +
+                          $"Content\r\n{payload}\r\n" +
+                          $"Result code is {(response as HttpWebResponse)?.StatusCode}\r\n" +
+                          $"Result content: {result}");
+
+            }
         }
     }
 }

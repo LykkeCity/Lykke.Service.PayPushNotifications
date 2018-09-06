@@ -62,4 +62,4 @@ node_modules
 **/*sonar*
 
 #Custom
-/client/Lykke.Service.PayPushNotifications.Client/Lykke.Service.PayPushNotifications.Client.xml
+client/Lykke.Service.PayPushNotifications.Client/Lykke.Service.PayPushNotifications.Client.xml
