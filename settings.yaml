@@ -8,7 +8,7 @@ PayPushNotificationsService:
             types: [ AzureTableStorage, Tag ]
         EmployeeNotificationIdsTableName: PayPushNotificationsEmployeeNotificationIds
         MerchantNotificationIdsTableName: PayPushNotificationsMerchantNotificationIds
-        NotificationsTableName: PayPushNotificationsNotifications
+        NotificationsTableName: PayPushNotifications
     Rabbit:
         ConnectionString: 
             settings-key: RabbitPay
