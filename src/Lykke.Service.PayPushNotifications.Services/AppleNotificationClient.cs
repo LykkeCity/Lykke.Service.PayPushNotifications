@@ -36,7 +36,7 @@ namespace Lykke.Service.PayPushNotifications.Services
             var match = regexp.Match(connectionString);
             var baseUrl = match.Groups["url"].Value;
             var accessKey = match.Groups["key"].Value;
-            var accessKeyName = match.Groups["keyName"].Value+"1";
+            var accessKeyName = match.Groups["keyName"].Value;
 
             return new AppleNotificationClient(accessKey, accessKeyName, baseUrl, hubName, logFactory);
         }
