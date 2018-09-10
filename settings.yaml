@@ -6,9 +6,9 @@ PayPushNotificationsService:
         DataConnString: 
             settings-key: LykkePayDataConnString
             types: [ AzureTableStorage, Tag ]
-        EmployeeNotificationIdsTableName: EmployeeNotificationIds
-        MerchantNotificationIdsTableName: MerchantNotificationIds
-        NotificationsTableName: Notifications
+        EmployeeNotificationIdsTableName: PayPushNotificationsEmployeeNotificationIds
+        MerchantNotificationIdsTableName: PayPushNotificationsMerchantNotificationIds
+        NotificationsTableName: PayPushNotifications
     Rabbit:
         ConnectionString: 
             settings-key: RabbitPay
